@@ -18,4 +18,5 @@ dofile(path .. "/mobs/box_shoot.lua")
 dofile(path .. "/mobs/box_dig.lua")
 dofile(path .. "/mobs/box_spike.lua")
 dofile(path .. "/mobs/box_fire.lua")
+dofile(path .. "/mobs/box_poison.lua")
 

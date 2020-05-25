@@ -154,5 +154,9 @@ minetest.register_node("cube_mobs:poison", {
 	groups = {
 		cracky = 3, catchable=1
 	},
+	on_timer = function(pos)
+        minetest.remove_node(pos)
+        return false
+    end,
 	sounds = default.node_sound_leaves_defaults(),
 })
