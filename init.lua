@@ -1,5 +1,4 @@
 -- Created by Xanthus using mobkit
--- V 0.1
 
 cube_mobkit = {} -- includes altered functions similar to those found in mobkit (cube_mobkit.lq_jumpattack)
 cube_mobkit.mob_names = {} -- list of names used for spawning. add mob names to the list after registering
@@ -12,6 +11,7 @@ dofile(path .. "/api.lua")
 dofile(path .. "/spawns.lua")
 dofile(path .. "/items.lua")
 dofile(path .. "/nodes.lua")
+dofile(path .. "/mobs/dummy.lua")
 dofile(path .. "/mobs/box.lua")
 dofile(path .. "/mobs/box_small.lua")
 dofile(path .. "/mobs/box_shoot.lua")

@@ -2,7 +2,7 @@ minetest.register_entity("cube_mobs:box_poison",{
 											-- common props
 	physical = true,
 	collide_with_objects = false,
-	collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+	collisionbox	 = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 	visual = "cube",
 	visual_size = {x = 1, y = 1},
 	textures = {"cube_mobs_box_poison_side.png","cube_mobs_box_poison_side.png","cube_mobs_box_poison_side.png","cube_mobs_box_poison_side.png","cube_mobs_box_poison_front.png","cube_mobs_box_poison_side.png"},
@@ -38,10 +38,14 @@ minetest.register_entity("cube_mobs:box_poison",{
 		local pos = self.object:get_pos()
 		for i=-2,2 do
 			for j =-2,2 do
-				local npos = {x=pos.x+i,y=pos.y+1,z=pos.z+j}
-				minetest.set_node( npos ,{name="cube_mobs:poison"})
-				local timer = minetest.get_node_timer(npos)
-				timer:start(10) -- poison dissappear after 10 seconds
+				for k = -1,1 do 
+					local npos = {x=pos.x+i,y=pos.y+k,z=pos.z+j}
+					if(minetest.get_node(npos).name=="air") then
+						minetest.set_node( npos ,{name="cube_mobs:poison"})
+						local timer = minetest.get_node_timer(npos)
+						timer:start(10) -- poison dissappear after 10 seconds
+					end
+				end
 			end
 		end
 	end,

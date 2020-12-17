@@ -277,6 +277,54 @@ function cube_mobkit.box_brain(self)
 	end
 end
 
+function cube_mobkit.box_brain(self)
+-- vitals should be checked every step
+	if mobkit.timer(self,1) then
+		lava_dmg(self,6) 
+	end
+	
+	mobkit.vitals(self)
+--	if self.object:get_hp() <=100 then	
+	if self.hp <= 0 then	
+		if self.on_death then self.on_death(self) end
+		if self.drops then
+			for _,v in pairs(self.drops) do
+				local rnd = math.random(1,255)				
+				if v.prob>=rnd then
+					local qty = math.random(v.min,v.max)
+					local item = minetest.add_item(self.object:get_pos(), ItemStack(v.name.." "..qty))
+					item:set_velocity({x=math.random(-2,2),y=5,z=math.random(-2,2)})
+				end
+			end
+		end
+		mobkit.clear_queue_high(self)									-- cease all activity
+		mobkit.hq_die(self)												-- kick the bucket
+		return
+	end
+
+	local prty = mobkit.get_queue_priority(self)
+	if mobkit.timer(self,1) then 			-- decision making needn't happen every engine step
+		if prty < 20 and self.isinliquid then
+			mobkit.hq_liquid_recovery(self,20)
+			return
+		end
+		
+		local pos=self.object:get_pos()
+				
+		if prty < 9 then
+			local plyr = mobkit.get_nearby_player(self)					
+			if plyr and vector.distance(pos,plyr:get_pos()) < 20 then	-- if player close
+				cube_mobkit.hq_hunt(self,10,plyr)
+			end															
+		end
+		
+		-- fool around
+		if mobkit.is_queue_empty_high(self) then
+			mobkit.hq_roam(self,0)
+		end
+	end
+end
+
 
 cube_mobkit.shoot = function(self, target, shot_name,cooldown)
 	local func = function(self)

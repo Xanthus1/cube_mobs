@@ -3,8 +3,8 @@ local num_spawns = 0
 
 local abr = minetest.get_mapgen_setting('active_block_range')
 
-local spawn_rate = 1 - math.max(math.min(minetest.settings:get('cube_mobs_spawn_chance') or 0.1,1),0)
-local spawn_reduction = minetest.settings:get('cube_mobs_spawn_reduction') or 0.1
+local spawn_rate = math.min(math.max(minetest.settings:get('cube_mobs_spawn_chance') or 2,.5),4)
+local spawn_reduction = minetest.settings:get('cube_mobs_spawn_reduction') or 0.5
 local spawn_timer = 5 --  try to spawn every 5 seconds
 
 local function spawnstep(dtime)
@@ -13,7 +13,7 @@ local function spawnstep(dtime)
 		for _,plyr in ipairs(minetest.get_connected_players()) do
 			local vel = plyr:get_player_velocity()
 			local spd = vector.length(vel)
-			local chance = spawn_rate * 1/(spd*0.75+1)  -- chance is quadrupled for speed=4
+			local chance = spawn_rate  -- chance is quadrupled for speed=4
 			
 			local player_name = plyr:get_player_name()		
 			
@@ -28,10 +28,11 @@ local function spawnstep(dtime)
 			local pos = plyr:get_pos()
 			
 			local cave_modifier = 1 
-			if pos.y<-8 then 
+			if pos.y<-8 then  -- don't spawn as far in caves
 				cave_modifier = .5
 			end
-			local dir = vector.multiply(minetest.yaw_to_dir(yaw),abr*16*cave_modifier)
+			local dist = abr*16*cave_modifier * (math.random()*.5+.75) -- vary distance between 75% and 125%
+			local dir = vector.multiply(minetest.yaw_to_dir(yaw),dist)
 			
 
 			local pos2 = vector.add(pos,dir)
@@ -64,12 +65,12 @@ local function spawnstep(dtime)
 				if not obj:is_player() then
 					local luaent = obj:get_luaentity()
 					if luaent and luaent.name:find('cube_mobs:') then
-						chance=chance + (1-chance)*spawn_reduction	-- chance reduced for every mob in range
+						chance=chance-spawn_reduction	-- chance reduced for every mob in range
 						local mob_pos = obj:get_pos()					
 					end
 				end
 			end
-			if chance < math.random() then
+			if chance > math.random() then
 				local mobname = cube_mobkit.mob_names[math.random(#cube_mobkit.mob_names)]
 								
 				objs = minetest.get_objects_inside_radius(pos_spawn,abr*16*cave_modifier-2)
@@ -79,7 +80,10 @@ local function spawnstep(dtime)
 					end
 				end
 				
-				-- minetest.chat_send_all("Spawned at:"..floor(pos_spawn.x).." "..floor(pos_spawn.y).." "..floor(pos_spawn.z))
+				-- chat for debugging and testing spawns
+				--minetest.chat_send_all("Spawned at:"..math.floor(pos_spawn.x).." "..math.floor(pos_spawn.y).." "..math.floor(pos_spawn.z))
+				--minetest.chat_send_all("Chance: "..chance)
+				
 				minetest.add_entity(pos_spawn,mobname)			-- spawn
 				num_spawns = num_spawns + 1
 			end
